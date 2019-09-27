@@ -115,9 +115,22 @@ func (k Keeper) DistributeTokenByScore(ctx sdk.Context, topicID string, fromAddr
 		return err
 	}
 
-	_, err = k.BankKeeper.SubtractCoins(ctx, fromAddress, sdk.NewCoins(amount))
+	distribution := make(map[string]sdk.Int)
+	sum := sdk.NewInt(0)
+	for acc, s := range score {
+		val, _ := sdk.NewIntFromString(fmt.Sprintf("%f", s*float64(amount.Amount.Int64())))
+		distribution[acc] = val
+		sum = sum.Add(val)
+	}
+
+	_, err = k.BankKeeper.SubtractCoins(ctx, fromAddress, sdk.NewCoins(sdk.NewCoin(amount.Denom, sum)))
 	if err != nil {
 		return err
+	}
+
+	for acc, val := range distribution {
+		address, _ := sdk.AccAddressFromBech32(acc)
+		k.BankKeeper.AddCoins(ctx, address, sdk.NewCoins(sdk.NewCoin(amount.Denom, val)))
 	}
 
 	return nil
