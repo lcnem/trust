@@ -34,7 +34,7 @@ func getCmdEvaluate(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "evaluate [topic_id] [to_address] [weight1000]",
 		Short: "evaluate",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
@@ -45,7 +45,12 @@ func getCmdEvaluate(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSetEvaluation(args[0], cliCtx.GetFromAddress(), toAddress, args[2])
+			weight1000, ok := sdk.NewIntFromString(args[2])
+			if !ok {
+				return sdk.ErrUnknownRequest(args[2])
+			}
+
+			msg := types.NewMsgEvaluate(args[0], cliCtx.GetFromAddress(), toAddress, weight1000)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -58,7 +63,7 @@ func getCmdEvaluate(cdc *codec.Codec) *cobra.Command {
 
 func getCmdDistributeTokenByScore(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "distribute [amount]",
+		Use:   "distribute [topic_id] [amount]",
 		Short: "distribute your token",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -68,12 +73,12 @@ func getCmdDistributeTokenByScore(cdc *codec.Codec) *cobra.Command {
 
 			fromAddress := cliCtx.GetFromAddress()
 
-			coins, err := sdk.ParseCoins(args[0])
+			coin, err := sdk.ParseCoin(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgBurnToken(fromAddress, coins)
+			msg := types.NewMsgDistributeTokenByScore(args[0], fromAddress, coin)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err

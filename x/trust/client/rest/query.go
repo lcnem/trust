@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
-func getMasterAddressHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
+func getAccountScoresHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/master-address", storeName), nil)
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores", storeName), []byte(r.FormValue("topic-ids")))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

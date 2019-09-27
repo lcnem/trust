@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/yukimura45z/pagerank-go"
 )
@@ -18,17 +17,15 @@ type Keeper struct {
 
 	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
 
-	BankKeeper   bank.Keeper
-	SupplyKeeper supply.Keeper
+	BankKeeper bank.Keeper
 }
 
 // NewKeeper creates new instances of the coin Keeper
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper, supplyKeeper supply.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper) Keeper {
 	return Keeper{
-		cdc:          cdc,
-		storeKey:     storeKey,
-		BankKeeper:   bankKeeper,
-		SupplyKeeper: supplyKeeper,
+		cdc:        cdc,
+		storeKey:   storeKey,
+		BankKeeper: bankKeeper,
 	}
 }
 

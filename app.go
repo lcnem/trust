@@ -87,7 +87,7 @@ type LcnemintApp struct {
 	distrKeeper          distr.Keeper
 	supplyKeeper         supply.Keeper
 	nftKeeper            nft.Keeper
-  trustKeeper          trust.Keeper
+	trustKeeper          trust.Keeper
 	paramsKeeper         params.Keeper
 
 	GenesisAccounts []authexported.Account
@@ -197,11 +197,10 @@ func NewLcnemintApp(
 		keys[nft.StoreKey],
 	)
 
-	app.backedtokenKeeper = trust.NewKeeper(
+	app.trustKeeper = trust.NewKeeper(
 		app.cdc,
 		keys[trust.StoreKey],
 		app.bankKeeper,
-		app.supplyKeeper,
 	)
 
 	app.mm = module.NewManager(
@@ -213,7 +212,7 @@ func NewLcnemintApp(
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.stakingAccountKeeper, app.supplyKeeper),
 		nft.NewAppModule(app.nftKeeper),
-		trust.NewAppModule(app.backedtokenKeeper, app.bankKeeper, app.supplyKeeper),
+		trust.NewAppModule(app.trustKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)

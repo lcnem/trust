@@ -4,23 +4,24 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/lcnem/lcnemint/x/backedtoken/internal/types"
+	"github.com/lcnem/lcnem-trust/x/trust/internal/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 )
 
-type mintTokenReq struct {
-	BaseReq   rest.BaseReq `json:"base_req"`
-	ToAddress string       `json:"to_address"`
-	Amount    string       `json:"amount"`
-	Master    string       `json:"master"`
+type evaluateReq struct {
+	BaseReq     rest.BaseReq `json:"base_req"`
+	TopicID     string       `json:"topic_id"`
+	FromAddress string       `json:"from_address"`
+	ToAddress   string       `json:"to_address"`
+	Weight1000  sdk.Int      `json:"weight1000"`
 }
 
-func mintTokenHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func evaluateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req mintTokenReq
+		var req evaluateReq
 
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
@@ -38,20 +39,14 @@ func mintTokenHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		coins, err := sdk.ParseCoins(req.Amount)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		master, err := sdk.AccAddressFromBech32(req.Master)
+		fromAddress, err := sdk.AccAddressFromBech32(req.FromAddress)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		// create the message
-		msg := types.NewMsgMintToken(toAddress, coins, master)
+		msg := types.NewMsgEvaluate(req.TopicID, fromAddress, toAddress, req.Weight1000)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -62,15 +57,16 @@ func mintTokenHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-type burnTokenReq struct {
+type distributeReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
+	TopicID     string       `json:"topic_id"`
 	FromAddress string       `json:"from_address"`
-	Amount      string       `json:"amount"`
+	Amount      sdk.Coin     `json:"amount"`
 }
 
-func burnTokenHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func distributeHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req burnTokenReq
+		var req distributeReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
@@ -87,59 +83,10 @@ func burnTokenHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		coins, err := sdk.ParseCoins(req.Amount)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		// create the message
-		msg := types.NewMsgBurnToken(fromAddress, coins)
+		msg := types.NewMsgDistributeTokenByScore(req.TopicID, fromAddress, req.Amount)
 		err = msg.ValidateBasic()
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
-	}
-}
-
-type updateMasterAddressReq struct {
-	BaseReq          rest.BaseReq `json:"base_req"`
-	MasterAddress    string       `json:"master_address"`
-	NewMasterAddress string       `json:"new_master_address"`
-}
-
-func updateMasterAddressHandler(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req updateMasterAddressReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
-
-		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		master, err := sdk.AccAddressFromBech32(req.MasterAddress)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		newMaster, err := sdk.AccAddressFromBech32(req.NewMasterAddress)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		// create the message
-		msg := types.NewMsgUpdateMasterAddress(master, newMaster)
-		err = msg.ValidateBasic()
-		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

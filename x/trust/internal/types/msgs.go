@@ -35,7 +35,7 @@ func (msg MsgEvaluate) Type() string { return "set_evaluation" }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgEvaluate) ValidateBasic() sdk.Error {
-	if !regexp.MustCompile("^[0-9a-z]{32}$").Match([]byte(msg.TopicID)) {
+	if !ValidateTopicID(msg.TopicID) {
 		return ErrInvalidTopicID()
 	}
 	if msg.FromAddress.Empty() {
@@ -85,7 +85,7 @@ func (msg MsgDistributeTokenByScore) Type() string { return "distribute_token_by
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgDistributeTokenByScore) ValidateBasic() sdk.Error {
-	if !regexp.MustCompile("^[0-9a-z]{32}$").Match([]byte(msg.TopicID)) {
+	if !ValidateTopicID(msg.TopicID) {
 		return ErrInvalidTopicID()
 	}
 	if msg.FromAddress.Empty() {
@@ -106,4 +106,8 @@ func (msg MsgDistributeTokenByScore) GetSignBytes() []byte {
 // GetSigners defines whose signature is required
 func (msg MsgDistributeTokenByScore) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.FromAddress}
+}
+
+func ValidateTopicID(topicID string) bool {
+	return regexp.MustCompile("^[0-9a-z]{32}$").Match([]byte(topicID))
 }

@@ -8,8 +8,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/lcnem/lcnem-trust/x/trust/client/cli"
 	"github.com/lcnem/lcnem-trust/x/trust/client/rest"
 
@@ -71,7 +69,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 // AppModule struct
 type AppModule struct {
 	AppModuleBasic
-	keeper       Keeper
+	keeper     Keeper
 }
 
 // NewAppModule creates a new AppModule Object

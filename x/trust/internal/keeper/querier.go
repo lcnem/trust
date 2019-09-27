@@ -9,7 +9,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// query endpoints supported by the backedtoken Querier
+// query endpoints supported by the trust Querier
 const (
 	QueryAccountScores = "account-scores"
 )
@@ -21,7 +21,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryAccountScores:
 			return queryAccountScores(ctx, path[1:], req, keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown backedtoken query endpoint")
+			return nil, sdk.ErrUnknownRequest("unknown trust query endpoint")
 		}
 	}
 }

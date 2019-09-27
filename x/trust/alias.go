@@ -29,6 +29,6 @@ type (
 	MsgEvaluate = types.MsgEvaluate
 	// MsgDistributeTokenByScore types.MsgDistributeTokenByScore
 	MsgDistributeTokenByScore = types.MsgDistributeTokenByScore
-	// QueryResMasterAddress types.QueryResMasterAccAddress
-	QueryResMasterAddress = types.QueryResMasterAddress
+	// QueryResAccountScores types.QueryResAccountScores
+	QueryResAccountScores = types.QueryResAccountScores
 )

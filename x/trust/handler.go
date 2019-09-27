@@ -23,14 +23,14 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 // Handle a message to evaluate
 func handleMsgEvaluate(ctx sdk.Context, keeper Keeper, msg MsgEvaluate) sdk.Result {
-	keeper.SetEvaluation()
+	keeper.SetEvaluation(ctx, msg.TopicID, msg.FromAddress, msg.ToAddress, msg.Weight1000)
 
 	return sdk.Result{}
 }
 
 // Handle a message to distribute token by score
 func handleMsgDistributeTokenByScore(ctx sdk.Context, keeper Keeper, msg MsgDistributeTokenByScore) sdk.Result {
-	keeper.DistributeTokenByScore()
+	keeper.DistributeTokenByScore(ctx, msg.TopicID, msg.FromAddress, msg.Amount)
 
 	return sdk.Result{}
 }
