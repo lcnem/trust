@@ -69,8 +69,8 @@ func MakeCodec() *codec.Codec {
 	return cdc
 }
 
-// LcnemintApp is App struct
-type LcnemintApp struct {
+// TrustApp is App struct
+type TrustApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -96,10 +96,10 @@ type LcnemintApp struct {
 	mm *module.Manager
 }
 
-// NewLcnemintApp is a constructor function for LcnemintApp
-func NewLcnemintApp(
+// NewTrustApp is a constructor function for TrustApp
+func NewTrustApp(
 	logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp),
-) *LcnemintApp {
+) *TrustApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -115,7 +115,7 @@ func NewLcnemintApp(
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
-	var app = &LcnemintApp{
+	var app = &TrustApp{
 		BaseApp: bApp,
 		cdc:     cdc,
 		keys:    keys,
@@ -271,7 +271,7 @@ func NewDefaultGenesisState() GenesisState {
 }
 
 // InitChainer inits genesis
-func (app *LcnemintApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *TrustApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 
 	err := app.cdc.UnmarshalJSON(req.AppStateBytes, &genesisState)
@@ -283,22 +283,22 @@ func (app *LcnemintApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) 
 }
 
 // BeginBlocker is a callback
-func (app *LcnemintApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *TrustApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
 // EndBlocker is a callback
-func (app *LcnemintApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *TrustApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
 // LoadHeight returns LoadVersion
-func (app *LcnemintApp) LoadHeight(height int64) error {
+func (app *TrustApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *LcnemintApp) ModuleAccountAddrs() map[string]bool {
+func (app *TrustApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -308,7 +308,7 @@ func (app *LcnemintApp) ModuleAccountAddrs() map[string]bool {
 }
 
 // ExportAppStateAndValidators exports app state and validators
-func (app *LcnemintApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
+func (app *TrustApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
 ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block

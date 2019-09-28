@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	app "github.com/lcnem/lcnemint"
+	app "github.com/lcnem/lcnem-trust"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
@@ -61,7 +61,7 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewLcnemintApp(logger, db)
+	return app.NewTrustApp(logger, db)
 }
 
 func exportAppStateAndTMValidators(
@@ -69,15 +69,15 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		lcnemintApp := app.NewLcnemintApp(logger, db)
-		err := lcnemintApp.LoadHeight(height)
+		trustApp := app.NewTrustApp(logger, db)
+		err := trustApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
 		}
-		return lcnemintApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+		return trustApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	lcnemintApp := app.NewLcnemintApp(logger, db)
+	trustApp := app.NewTrustApp(logger, db)
 
-	return lcnemintApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return trustApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

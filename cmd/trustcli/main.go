@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	app "github.com/lcnem/lcnemint"
+	app "github.com/lcnem/lcnem-trust"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	amino "github.com/tendermint/go-amino"
@@ -57,7 +57,7 @@ func main() {
 		client.NewCompletionCmd(rootCmd, true),
 	)
 
-	executor := cli.PrepareMainCmd(rootCmd, "LCNEMINT", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "TRUST", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)
