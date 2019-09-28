@@ -15,4 +15,5 @@ func init() {
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgEvaluate{}, "trust/MsgEvaluate", nil)
 	cdc.RegisterConcrete(MsgDistributeTokenByScore{}, "trust/MsgDistributeTokenByScore", nil)
+	cdc.RegisterConcrete(MsgDistributeTokenByEvaluation{}, "trust/MsgDistributeTokenByEvaluation", nil)
 }

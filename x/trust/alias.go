@@ -14,12 +14,13 @@ const (
 
 // nolint
 var (
-	NewKeeper                    = keeper.NewKeeper
-	NewQuerier                   = keeper.NewQuerier
-	NewMsgEvaluate               = types.NewMsgEvaluate
-	NewMsgDistributeTokenByScore = types.NewMsgDistributeTokenByScore
-	ModuleCdc                    = types.ModuleCdc
-	RegisterCodec                = types.RegisterCodec
+	NewKeeper                         = keeper.NewKeeper
+	NewQuerier                        = keeper.NewQuerier
+	NewMsgEvaluate                    = types.NewMsgEvaluate
+	NewMsgDistributeTokenByScore      = types.NewMsgDistributeTokenByScore
+	NewMsgDistributeTokenByEvaluation = types.NewMsgDistributeTokenByEvaluation
+	ModuleCdc                         = types.ModuleCdc
+	RegisterCodec                     = types.RegisterCodec
 )
 
 type (
@@ -29,6 +30,8 @@ type (
 	MsgEvaluate = types.MsgEvaluate
 	// MsgDistributeTokenByScore types.MsgDistributeTokenByScore
 	MsgDistributeTokenByScore = types.MsgDistributeTokenByScore
+	// MsgDistributeTokenByEvaluation types.MsgDistributeTokenByEvaluation
+	MsgDistributeTokenByEvaluation = types.MsgDistributeTokenByEvaluation
 	// QueryResAccountScores types.QueryResAccountScores
 	QueryResAccountScores = types.QueryResAccountScores
 )

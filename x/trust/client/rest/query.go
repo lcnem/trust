@@ -11,7 +11,7 @@ import (
 
 func getAccountScoresHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores", storeName), []byte(r.FormValue("topic-ids")))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores/%s", storeName, r.FormValue("address")), []byte(r.FormValue("topic-ids")))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

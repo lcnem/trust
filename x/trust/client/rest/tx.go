@@ -57,16 +57,16 @@ func evaluateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-type distributeReq struct {
+type distributeByScoreReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	TopicID     string       `json:"topic_id"`
 	FromAddress string       `json:"from_address"`
 	Amount      sdk.Coin     `json:"amount"`
 }
 
-func distributeHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func distributeByScoreHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req distributeReq
+		var req distributeByScoreReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
@@ -85,6 +85,51 @@ func distributeHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// create the message
 		msg := types.NewMsgDistributeTokenByScore(req.TopicID, fromAddress, req.Amount)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+	}
+}
+
+type distributeByEvaluationReq struct {
+	BaseReq     rest.BaseReq `json:"base_req"`
+	TopicID     string       `json:"topic_id"`
+	Address     string       `json:"address"`
+	FromAddress string       `json:"from_address"`
+	Amount      sdk.Coin     `json:"amount"`
+}
+
+func distributeByEvaluationHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req distributeByEvaluationReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		fromAddress, err := sdk.AccAddressFromBech32(req.FromAddress)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		Address, err := sdk.AccAddressFromBech32(req.Address)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// create the message
+		msg := types.NewMsgDistributeTokenByEvaluation(req.TopicID, Address, fromAddress, req.Amount)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

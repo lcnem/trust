@@ -14,10 +14,10 @@ const (
 
 // ErrInvalidTopicID is the error for invalid topic id
 func ErrInvalidTopicID() sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeInvalidTopicID, "Invalid topic ID")
+	return sdk.NewError(DefaultCodespace, CodeInvalidTopicID, "Topic ID must be 256bit hash string.")
 }
 
 // ErrInvalidWeight is the error for invalid weight
 func ErrInvalidWeight() sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeInvalidWeight, "Invalid weight")
+	return sdk.NewError(DefaultCodespace, CodeInvalidWeight, "1000times weight must be positive and less than or equal to 1000.")
 }
