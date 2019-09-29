@@ -161,5 +161,5 @@ func (msg MsgDistributeTokenByEvaluation) GetSigners() []sdk.AccAddress {
 }
 
 func validateTopicID(topicID string) bool {
-	return regexp.MustCompile("^[0-9a-z]{32}$").Match([]byte(topicID))
+	return regexp.MustCompile("^[a-z]([a-z0-9]|-)*$").Match([]byte(topicID))
 }

@@ -27,13 +27,13 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 
 func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "account-scores",
+		Use:   "account-scores [address] [topic-ids[,]]",
 		Short: "get account scores",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores/%s", queryRoute, args[0]), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores/%s", queryRoute, args[0]), []byte(args[1]))
 			if err != nil {
 				fmt.Printf("could not get account scores\n")
 				return nil
