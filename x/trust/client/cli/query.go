@@ -41,7 +41,7 @@ func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores/%s", queryRoute, params.Address), bz)
 			if err != nil {
-				fmt.Printf("could not get account scores\n")
+				fmt.Printf(err.Error())
 				return nil
 			}
 
