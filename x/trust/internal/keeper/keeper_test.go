@@ -109,7 +109,11 @@ func TestSetEvaluationAndTransition(t *testing.T) {
 
 	t.Log(scoreVector)
 
+	setEvaluationAndTransition(to, from, weight1000, &linkMatrix, &stochasticMatrix, &scoreVector)
+
+	t.Log(scoreVector)
+
 	require.Equal(t, float64(1), linkMatrix["a"]["b"])
 	require.Equal(t, float64(1), stochasticMatrix["a"]["b"])
-	require.Equal(t, 0, scoreVector["a"])
+	require.Equal(t, float64(0), scoreVector["a"])
 }

@@ -255,8 +255,8 @@ github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGr
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
-github.com/yukimura45z/pagerank-go v0.0.0-20190929071030-2888fcbb2bab h1:wFyqqb+onhSA+GJEjFh+kcWXD96zqmgKd9YARKp7KEI=
-github.com/yukimura45z/pagerank-go v0.0.0-20190929071030-2888fcbb2bab/go.mod h1:H9B4wXbPtVGqTtOUiu1WGUJ6t9UMZ31g7g8IBAWHMIE=
+github.com/yukimura45z/pagerank-go v0.0.0-20190929124623-c0d3bdb5a499 h1:nl5FTCrmNSDvvKACSNjjnBMG1/aBagBPiwGX0WfQ7TE=
+github.com/yukimura45z/pagerank-go v0.0.0-20190929124623-c0d3bdb5a499/go.mod h1:p6iuwttTlVa82fJ75kcwh8qODW+s4bxjoBPPPRNw06M=
 github.com/zondax/hid v0.9.0 h1:eiT3P6vNxAEVxXMw66eZUAAnU2zD33JBkfG/EnfAKl8=
 github.com/zondax/hid v0.9.0/go.mod h1:l5wttcP0jwtdLjqjMMWFVEE7d1zO0jvSPA9OPZxWpEM=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=

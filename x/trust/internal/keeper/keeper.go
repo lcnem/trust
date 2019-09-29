@@ -68,7 +68,7 @@ func (k Keeper) SetEvaluation(ctx sdk.Context, topicID string, fromAddress sdk.A
 
 func setEvaluationAndTransition(from string, to string, weight1000 int64, linkMatrix *pagerank.Matrix, stochasticMatrix *pagerank.Matrix, scoreVector *pagerank.Vector) {
 	linkMatrix.Set(from, to, float64(weight1000)/float64(1000))
-	(*stochasticMatrix)[from] = pagerank.GetStochastixMatrix(*linkMatrix)[from]
+	*stochasticMatrix = pagerank.GetStochastixMatrix(*linkMatrix)
 	*scoreVector, _ = pagerank.TransitionScore(*scoreVector, *stochasticMatrix)
 }
 
