@@ -39,7 +39,7 @@ func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out map[string]float64
+			var out types.QueryResAccountScores
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},
