@@ -17,5 +17,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/evaluate", storeName), evaluateHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/distribute-by-score", storeName), distributeByScoreHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/distribute-by-evaluation", storeName), distributeByEvaluationHandler(cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/%s/score/{address}", storeName), getAccountScoresHandler(cliCtx, storeName)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/score/{address}", storeName), getAccountScoresHandler(cliCtx, storeName)).Queries("topic-ids", "{topic-ids}").Methods("GET")
 }

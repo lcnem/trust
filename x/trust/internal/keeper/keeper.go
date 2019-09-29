@@ -31,12 +31,11 @@ func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper) 
 
 // GetAccountScores returns the score
 func (k Keeper) GetAccountScores(ctx sdk.Context, topicIDs []string, accAddress sdk.AccAddress) pagerank.Vector {
-	store := ctx.KVStore(k.storeKey)
 	account := accAddress.String()
 	scoreVector := make(pagerank.Vector)
 
 	for _, topicID := range topicIDs {
-		s, err := getScoreVector(store, topicID)
+		s, err := k.getVectorUnmarshaled(ctx, getScoreVectorKey(topicID))
 		if err != nil {
 			continue
 		}
@@ -48,102 +47,122 @@ func (k Keeper) GetAccountScores(ctx sdk.Context, topicIDs []string, accAddress 
 
 // SetEvaluation sets the evaluation
 func (k Keeper) SetEvaluation(ctx sdk.Context, topicID string, fromAddress sdk.AccAddress, toAddress sdk.AccAddress, weight1000 sdk.Int) error {
-	store := ctx.KVStore(k.storeKey)
 	from := fromAddress.String()
 	to := toAddress.String()
 
-	linkMatrix, err := getLinkMatrix(store, topicID)
-
+	linkMatrix, err := k.getMatrixUnmarshaled(ctx, getLinkMatrixKey(topicID))
 	if err != nil {
 		return err
 	}
 
-	if linkMatrix[from] == nil {
-		linkMatrix[from] = make(pagerank.Vector)
-	}
+	linkMatrix.Set(from, to, float64(weight1000.Int64())/float64(1000))
 
-	linkMatrix[from][to] = float64(weight1000.Int64()) / float64(1000)
-
-	stochasticMatrix, err := getStochasticMatrix(store, topicID)
+	key := getStochasticMatrixKey(topicID)
+	stochasticMatrix, err := k.getMatrixUnmarshaled(ctx, key)
 	stochasticMatrix[from] = pagerank.GetStochastixMatrix(linkMatrix)[from]
 
-	setStochasticMatrix(store, topicID, stochasticMatrix)
+	k.setMarshaled(ctx, key, stochasticMatrix)
 
-	score, err := getScoreVector(store, topicID)
-	if err != nil {
-		score[from] = 0.5
-		score[to] = 0.5
-	}
+	key = getScoreVectorKey(topicID)
+	score, _ := k.getVectorUnmarshaled(ctx, key)
 
-	score = pagerank.TransitionScore(score, stochasticMatrix)
-	setScoreVector(store, topicID, score)
+	score, _ = pagerank.TransitionScore(score, stochasticMatrix)
+	k.setMarshaled(ctx, key, score)
 
 	return nil
 }
 
 // DistributeTokenByScore distributes token by score
 func (k Keeper) DistributeTokenByScore(ctx sdk.Context, topicID string, fromAddress sdk.AccAddress, amount sdk.Coin) error {
-	store := ctx.KVStore(k.storeKey)
-	score, err := getScoreVector(store, topicID)
+	scoreVector, err := k.getVectorUnmarshaled(ctx, getScoreVectorKey(topicID))
 	if err != nil {
 		return err
 	}
 
-	amountvector := make(map[string]sdk.Int)
+	amountVector, sum := getAmountVectorAndSumByScore(amount.Amount, scoreVector)
+
+	distribute(k, ctx, fromAddress, amount.Denom, sum, amountVector)
+
+	return nil
+}
+
+func getAmountVectorAndSumByScore(amount sdk.Int, scoreVector pagerank.Vector) (map[string]sdk.Int, sdk.Int) {
+	amountVector := make(map[string]sdk.Int)
 	sum := sdk.NewInt(0)
-	for acc, s := range score {
-		val := sdk.NewInt(int64(s * float64(amount.Amount.Int64())))
-		amountvector[acc] = val
+	for acc, s := range scoreVector {
+		val := sdk.NewInt(int64(s * float64(amount.Int64())))
+		amountVector[acc] = val
 		sum = sum.Add(val)
 	}
 
-	distribute(k, ctx, fromAddress, sdk.NewCoin(amount.Denom, sum), amountvector)
-
-	return nil
+	return amountVector, sum
 }
 
 // DistributeTokenByEvaluation distributes token by evaluation
 func (k Keeper) DistributeTokenByEvaluation(ctx sdk.Context, topicID string, address sdk.AccAddress, fromAddress sdk.AccAddress, amount sdk.Coin) error {
-	store := ctx.KVStore(k.storeKey)
-	score, err := getScoreVector(store, topicID)
+	scoreVector, err := k.getVectorUnmarshaled(ctx, getScoreVectorKey(topicID))
 	if err != nil {
 		return err
 	}
-	stochasticMatrix, err := getStochasticMatrix(store, topicID)
+	stochasticMatrix, err := k.getMatrixUnmarshaled(ctx, getStochasticMatrixKey(topicID))
 	if err != nil {
 		return err
 	}
 
-	amountvector := make(map[string]sdk.Int)
+	amountVector, sum := getAmountVectorAndSumByEvaluation(address.String(), amount.Amount, scoreVector, stochasticMatrix)
+
+	distribute(k, ctx, fromAddress, amount.Denom, sum, amountVector)
+
+	return nil
+}
+
+func getAmountVectorAndSumByEvaluation(address string, amount sdk.Int, scoreVector pagerank.Vector, stochasticMatrix pagerank.Matrix) (map[string]sdk.Int, sdk.Int) {
+	amountVector := map[string]sdk.Int{}
 	sum := sdk.NewInt(0)
 	for from, vec := range stochasticMatrix {
-		stochastic, ok := vec[address.String()]
+		stochastic, ok := vec[address]
 		if !ok {
 			continue
 		}
-		val := sdk.NewInt(int64(stochastic * score[from] / score[address.String()] * float64(amount.Amount.Int64())))
-		amountvector[from] = val
+		val := sdk.NewInt(int64(stochastic * scoreVector[from] / scoreVector[address] * float64(amount.Int64())))
+		amountVector[from] = val
 		sum = sum.Add(val)
 	}
 
-	distribute(k, ctx, fromAddress, sdk.NewCoin(amount.Denom, sum), amountvector)
-
-	return nil
+	return amountVector, sum
 }
 
-func getScoreVector(store sdk.KVStore, topicID string) (pagerank.Vector, error) {
-	key := fmt.Sprintf("%s/score", topicID)
-	score := make(pagerank.Vector)
-
-	err := json.Unmarshal(store.Get([]byte(key)), &score)
-
-	return score, err
+func getScoreVectorKey(topicID string) string {
+	return fmt.Sprintf("%s/score-vector", topicID)
 }
 
-func setScoreVector(store sdk.KVStore, topicID string, scoreVector pagerank.Vector) error {
-	key := fmt.Sprintf("%s/score", topicID)
+func getLinkMatrixKey(topicID string) string {
+	return fmt.Sprintf("%s/link-matrix", topicID)
+}
 
-	binary, err := json.Marshal(scoreVector)
+func getStochasticMatrixKey(topicID string) string {
+	return fmt.Sprintf("%s/stochastic-matrix", topicID)
+}
+
+func (k Keeper) getVectorUnmarshaled(ctx sdk.Context, key string) (pagerank.Vector, error) {
+	store := ctx.KVStore(k.storeKey)
+	vector := pagerank.Vector{}
+	err := json.Unmarshal(store.Get([]byte(key)), &vector)
+
+	return vector, err
+}
+
+func (k Keeper) getMatrixUnmarshaled(ctx sdk.Context, key string) (pagerank.Matrix, error) {
+	store := ctx.KVStore(k.storeKey)
+	matrix := pagerank.Matrix{}
+	err := json.Unmarshal(store.Get([]byte(key)), &matrix)
+
+	return matrix, err
+}
+
+func (k Keeper) setMarshaled(ctx sdk.Context, key string, v interface{}) error {
+	store := ctx.KVStore(k.storeKey)
+	binary, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -152,57 +171,15 @@ func setScoreVector(store sdk.KVStore, topicID string, scoreVector pagerank.Vect
 	return nil
 }
 
-func getLinkMatrix(store sdk.KVStore, topicID string) (pagerank.Matrix, error) {
-	key := fmt.Sprintf("%s/link-matrix", topicID)
-	stochasticMatrix := make(pagerank.Matrix)
-
-	err := json.Unmarshal(store.Get([]byte(key)), &stochasticMatrix)
-
-	return stochasticMatrix, err
-}
-
-func setLinkMatrix(store sdk.KVStore, topicID string, linkMatrix pagerank.Matrix) error {
-	key := fmt.Sprintf("%s/link-matrix", topicID)
-
-	binary, err := json.Marshal(linkMatrix)
-	if err != nil {
-		return err
-	}
-	store.Set([]byte(key), binary)
-
-	return nil
-}
-
-func getStochasticMatrix(store sdk.KVStore, topicID string) (pagerank.Matrix, error) {
-	key := fmt.Sprintf("%s/stochastic-matrix", topicID)
-	stochasticMatrix := make(pagerank.Matrix)
-
-	err := json.Unmarshal(store.Get([]byte(key)), &stochasticMatrix)
-
-	return stochasticMatrix, err
-}
-
-func setStochasticMatrix(store sdk.KVStore, topicID string, stochasticMatrix pagerank.Matrix) error {
-	key := fmt.Sprintf("%s/stochastic-matrix", topicID)
-
-	binary, err := json.Marshal(stochasticMatrix)
-	if err != nil {
-		return err
-	}
-	store.Set([]byte(key), binary)
-
-	return nil
-}
-
-func distribute(k Keeper, ctx sdk.Context, fromAddress sdk.AccAddress, amount sdk.Coin, amountVector map[string]sdk.Int) error {
-	_, err := k.BankKeeper.SubtractCoins(ctx, fromAddress, sdk.NewCoins(amount))
+func distribute(k Keeper, ctx sdk.Context, fromAddress sdk.AccAddress, denom string, sum sdk.Int, amountVector map[string]sdk.Int) error {
+	_, err := k.BankKeeper.SubtractCoins(ctx, fromAddress, sdk.NewCoins(sdk.NewCoin(denom, sum)))
 	if err != nil {
 		return err
 	}
 
 	for acc, val := range amountVector {
 		address, _ := sdk.AccAddressFromBech32(acc)
-		k.BankKeeper.AddCoins(ctx, address, sdk.NewCoins(sdk.NewCoin(amount.Denom, val)))
+		k.BankKeeper.AddCoins(ctx, address, sdk.NewCoins(sdk.NewCoin(denom, val)))
 	}
 
 	return nil

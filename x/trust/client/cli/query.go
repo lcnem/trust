@@ -33,7 +33,13 @@ func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores/%s", queryRoute, args[0]), []byte(args[1]))
+			params := types.NewQueryAccountScoresParam(args[0], args[1])
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores/%s", queryRoute, params.Address), bz)
 			if err != nil {
 				fmt.Printf("could not get account scores\n")
 				return nil
