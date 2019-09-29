@@ -32,13 +32,10 @@ func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper) 
 // GetAccountScores returns the score
 func (k Keeper) GetAccountScores(ctx sdk.Context, topicIDs []string, accAddress sdk.AccAddress) pagerank.Vector {
 	account := accAddress.String()
-	scoreVector := make(pagerank.Vector)
+	scoreVector := pagerank.Vector{}
 
 	for _, topicID := range topicIDs {
-		s, err := k.getVectorUnmarshaled(ctx, getScoreVectorKey(topicID))
-		if err != nil {
-			continue
-		}
+		s, _ := k.getVectorUnmarshaled(ctx, getScoreVectorKey(topicID))
 		scoreVector[topicID] = s[account]
 	}
 

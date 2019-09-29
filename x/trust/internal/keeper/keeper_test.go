@@ -21,11 +21,7 @@ func TestGetAccountScores(t *testing.T) {
 	scoreVector := pagerank.Vector{}
 
 	for _, topicID := range topicIDs {
-		s, err := getScoreVectorMock(topicID)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
+		s, _ := getScoreVectorMock(topicID)
 		scoreVector[topicID] = s[account]
 
 		t.Log(account)
