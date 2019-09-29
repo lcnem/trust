@@ -53,15 +53,15 @@ func (k Keeper) SetEvaluation(ctx sdk.Context, topicID string, fromAddress sdk.A
 	stochasticKey := getStochasticMatrixKey(topicID)
 	scoreKey := getScoreVectorKey(topicID)
 
-	linkMatrix, _ := k.getMatrixUnmarshaled(ctx, linkKey)
-	stochasticMatrix, _ := k.getMatrixUnmarshaled(ctx, stochasticKey)
+	linkMatrix := k.getMatrixUnmarshaled(ctx, linkKey)
+	stochasticMatrix := k.getMatrixUnmarshaled(ctx, stochasticKey)
 	scoreVector, _ := k.getVectorUnmarshaled(ctx, scoreKey)
 
 	setEvaluationAndTransition(from, to, weight1000.Int64(), &linkMatrix, &stochasticMatrix, &scoreVector)
 
-	k.setMarshaled(ctx, linkKey, linkMatrix)
-	k.setMarshaled(ctx, stochasticKey, stochasticMatrix)
-	k.setMarshaled(ctx, scoreKey, scoreVector)
+	k.setMatrixMarshaled(ctx, linkKey, linkMatrix)
+	k.setMatrixMarshaled(ctx, stochasticKey, stochasticMatrix)
+	k.setVectorMarshaled(ctx, scoreKey, scoreVector)
 
 	return nil
 }
@@ -104,10 +104,7 @@ func (k Keeper) DistributeTokenByEvaluation(ctx sdk.Context, topicID string, add
 	if err != nil {
 		return err
 	}
-	stochasticMatrix, err := k.getMatrixUnmarshaled(ctx, getStochasticMatrixKey(topicID))
-	if err != nil {
-		return err
-	}
+	stochasticMatrix := k.getMatrixUnmarshaled(ctx, getStochasticMatrixKey(topicID))
 
 	amountVector, sum := getAmountVectorAndSumByEvaluation(address.String(), amount.Amount, scoreVector, stochasticMatrix)
 
@@ -152,17 +149,42 @@ func (k Keeper) getVectorUnmarshaled(ctx sdk.Context, key string) (pagerank.Vect
 	return vector, err
 }
 
-func (k Keeper) getMatrixUnmarshaled(ctx sdk.Context, key string) (pagerank.Matrix, error) {
+func (k Keeper) getMatrixUnmarshaled(ctx sdk.Context, key string) pagerank.Matrix {
 	store := ctx.KVStore(k.storeKey)
-	matrix := pagerank.Matrix{}
-	err := json.Unmarshal(store.Get([]byte(key)), &matrix)
+	rawMatrix := map[string]json.RawMessage{}
+	json.Unmarshal(store.Get([]byte(key)), &rawMatrix)
 
-	return matrix, err
+	matrix := pagerank.Matrix{}
+	for src, raw := range rawMatrix {
+		vec := pagerank.Vector{}
+		json.Unmarshal(raw, &vec)
+		matrix[src] = vec
+	}
+
+	return matrix
 }
 
-func (k Keeper) setMarshaled(ctx sdk.Context, key string, v interface{}) error {
+func (k Keeper) setVectorMarshaled(ctx sdk.Context, key string, v pagerank.Vector) error {
 	store := ctx.KVStore(k.storeKey)
 	binary, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	store.Set([]byte(key), binary)
+
+	return nil
+}
+
+func (k Keeper) setMatrixMarshaled(ctx sdk.Context, key string, m pagerank.Matrix) error {
+	store := ctx.KVStore(k.storeKey)
+	rawMatrix := map[string]json.RawMessage{}
+
+	for src, vec := range m {
+		raw, _ := json.Marshal(vec)
+		rawMatrix[src] = raw
+	}
+
+	binary, err := json.Marshal(rawMatrix)
 	if err != nil {
 		return err
 	}
