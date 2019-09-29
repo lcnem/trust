@@ -24,19 +24,28 @@ func NewHandler(keeper Keeper) sdk.Handler {
 }
 
 func handleMsgEvaluate(ctx sdk.Context, keeper Keeper, msg MsgEvaluate) sdk.Result {
-	keeper.SetEvaluation(ctx, msg.TopicID, msg.FromAddress, msg.ToAddress, msg.Weight1000)
+	err := keeper.SetEvaluation(ctx, msg.TopicID, msg.FromAddress, msg.ToAddress, msg.Weight1000)
+	if err != nil {
+		return sdk.ResultFromError(err)
+	}
 
 	return sdk.Result{}
 }
 
 func handleMsgDistributeTokenByScore(ctx sdk.Context, keeper Keeper, msg MsgDistributeTokenByScore) sdk.Result {
-	keeper.DistributeTokenByScore(ctx, msg.TopicID, msg.FromAddress, msg.Amount)
+	err := keeper.DistributeTokenByScore(ctx, msg.TopicID, msg.FromAddress, msg.Amount)
+	if err != nil {
+		return sdk.ResultFromError(err)
+	}
 
 	return sdk.Result{}
 }
 
 func handleMsgDistributeTokenByEvaluation(ctx sdk.Context, keeper Keeper, msg MsgDistributeTokenByEvaluation) sdk.Result {
-	keeper.DistributeTokenByEvaluation(ctx, msg.TopicID, msg.Address, msg.FromAddress, msg.Amount)
+	err := keeper.DistributeTokenByEvaluation(ctx, msg.TopicID, msg.Address, msg.FromAddress, msg.Amount)
+	if err != nil {
+		return sdk.ResultFromError(err)
+	}
 
 	return sdk.Result{}
 }

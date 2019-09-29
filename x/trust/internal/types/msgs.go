@@ -31,7 +31,7 @@ func NewMsgEvaluate(topicID string, fromAddress sdk.AccAddress, toAddress sdk.Ac
 func (msg MsgEvaluate) Route() string { return RouterKey }
 
 // Type should return the action
-func (msg MsgEvaluate) Type() string { return "set_evaluation" }
+func (msg MsgEvaluate) Type() string { return "evaluate" }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgEvaluate) ValidateBasic() sdk.Error {

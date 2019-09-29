@@ -49,6 +49,29 @@ func getScoreVectorMock(topicID string) (pagerank.Vector, error) {
 	return score, err
 }
 
+func TestGetMatrixUnmarshaled(t *testing.T) {
+	m1 := pagerank.Matrix{
+		"a": pagerank.Vector{
+			"b": 0.5,
+			"c": 0.5,
+		},
+		"b": pagerank.Vector{
+			"a": 0.7,
+			"c": 0.3,
+		},
+		"c": pagerank.Vector{
+			"a": 0.5,
+			"b": 0.5,
+		},
+	}
+	binary, _ := json.Marshal(m1)
+	m2 := pagerank.Matrix{}
+	json.Unmarshal(binary, &m2)
+
+	require.Equal(t, m1["a"]["a"], m2["a"]["a"])
+	require.Equal(t, 0.3, m2.Get("b", "c"))
+}
+
 func TestGetAmountVectorAndSumByScore(t *testing.T) {
 	scoreVector := pagerank.Vector{
 		"a": 0.3,
@@ -73,4 +96,20 @@ func TestGetAmountVectorAndSumByEvaluation(t *testing.T) {
 	vec, sum := getAmountVectorAndSumByEvaluation("c", sdk.NewInt(100000), scoreVector, stochasticMatrix)
 	require.Equal(t, int64(50000), vec["a"].Int64())
 	require.Equal(t, int64(100000), sum.Int64())
+}
+
+func TestSetEvaluationAndTransition(t *testing.T) {
+	from := "a"
+	to := "b"
+	weight1000 := int64(1000)
+	linkMatrix := pagerank.Matrix{}
+	stochasticMatrix := pagerank.Matrix{}
+	scoreVector := pagerank.Vector{}
+	setEvaluationAndTransition(from, to, weight1000, &linkMatrix, &stochasticMatrix, &scoreVector)
+
+	t.Log(scoreVector)
+
+	require.Equal(t, float64(1), linkMatrix["a"]["b"])
+	require.Equal(t, float64(1), stochasticMatrix["a"]["b"])
+	require.Equal(t, 0, scoreVector["a"])
 }

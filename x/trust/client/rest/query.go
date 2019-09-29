@@ -22,7 +22,7 @@ func getAccountScoresHandler(cliCtx context.CLIContext, storeName string) http.H
 			return
 		}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores/%s", storeName, params.Address), bz)
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores", storeName), bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
