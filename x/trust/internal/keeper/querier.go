@@ -28,15 +28,19 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	address, err := sdk.AccAddressFromBech32(path[0])
+	var param types.QueryAccountScoresParam
+	codec.Cdc.MustUnmarshalJSON(req.Data, &param)
+
+	address, err := sdk.AccAddressFromBech32(param.Address)
 	if err != nil {
 		return nil, sdk.ErrInvalidAddress(address.String())
 	}
-	topicIDs := strings.Split(path[1], ",")
+	topicIDs := strings.Split(param.TopicIDs, ",")
 
 	vector := keeper.GetAccountScores(ctx, topicIDs, address)
+	bz := codec.MustMarshalJSONIndent(keeper.cdc, vector)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResAccountScores{Scores: vector})
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResAccountScores{Scores: string(bz)})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
