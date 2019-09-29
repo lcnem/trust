@@ -32,6 +32,4 @@ type (
 	MsgDistributeTokenByScore = types.MsgDistributeTokenByScore
 	// MsgDistributeTokenByEvaluation types.MsgDistributeTokenByEvaluation
 	MsgDistributeTokenByEvaluation = types.MsgDistributeTokenByEvaluation
-	// QueryResAccountScores types.QueryResAccountScores
-	QueryResAccountScores = types.QueryResAccountScores
 )
