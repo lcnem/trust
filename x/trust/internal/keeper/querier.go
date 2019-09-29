@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/lcnem/lcnem-trust/x/trust/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -35,7 +36,7 @@ func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, k
 
 	vector := keeper.GetAccountScores(ctx, topicIDs, address)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, vector)
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResAccountScores{Scores: vector})
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
