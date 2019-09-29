@@ -12,16 +12,14 @@ RUN yum update -y && \
     yum install git -y
 
 RUN git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/lcnem-trust.git && \
+    git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/lcnem-trust-public.git && \
     cd lcnem-trust && \
     go install ./cmd/trustcli && \
     go install ./cmd/trustd && \
     cp trustd.service /etc/systemd/system/trustd.service && \
     cd ../ && \
     rm -rf lcnem-trust && \
-    systemctl enable trustd && \
-    firewall-cmd --add-port=26656/tcp --zone=public --permanent && \
-    firewall-cmd --add-port=26657/tcp --zone=public --permanent && \
-    firewall-cmd --reload
+    systemctl enable trustd
 
 EXPOSE 26656
 EXPOSE 26657
