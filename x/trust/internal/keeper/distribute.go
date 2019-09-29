@@ -8,10 +8,7 @@ import (
 
 // DistributeTokenByScore distributes token by score
 func (k Keeper) DistributeTokenByScore(ctx sdk.Context, topicID string, fromAddress sdk.AccAddress, amount sdk.Coin) error {
-	scoreVector, err := k.getVectorUnmarshaled(ctx, getScoreVectorKey(topicID))
-	if err != nil {
-		return err
-	}
+	scoreVector := k.getScoreVectorUnmarshaled(ctx, topicID)
 
 	amountVector, sum := getAmountVectorAndSumByScore(amount.Amount, scoreVector)
 
@@ -34,14 +31,9 @@ func getAmountVectorAndSumByScore(amount sdk.Int, scoreVector pagerank.Vector) (
 
 // DistributeTokenByEvaluation distributes token by evaluation
 func (k Keeper) DistributeTokenByEvaluation(ctx sdk.Context, topicID string, address sdk.AccAddress, fromAddress sdk.AccAddress, amount sdk.Coin) error {
-	scoreVector, err := k.getVectorUnmarshaled(ctx, getScoreVectorKey(topicID))
-	if err != nil {
-		return err
-	}
-	stochasticMatrix, err := k.getMatrixUnmarshaled(ctx, getStochasticMatrixKey(topicID))
-	if err != nil {
-		return err
-	}
+	scoreVector := k.getScoreVectorUnmarshaled(ctx, topicID)
+
+	stochasticMatrix := k.getStochasticMatrixUnmarshaled(ctx, topicID)
 
 	amountVector, sum := getAmountVectorAndSumByEvaluation(address.String(), amount.Amount, scoreVector, stochasticMatrix)
 

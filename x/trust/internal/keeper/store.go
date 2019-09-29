@@ -8,54 +8,50 @@ import (
 	"github.com/yukimura45z/pagerank-go"
 )
 
-func getScoreVectorKey(topicID string) string {
-	return fmt.Sprintf("%s/score-vector", topicID)
-}
-
-func getLinkMatrixKey(topicID string) string {
-	return fmt.Sprintf("%s/link-matrix", topicID)
-}
-
-func getStochasticMatrixKey(topicID string) string {
-	return fmt.Sprintf("%s/stochastic-matrix", topicID)
-}
-
-func (k Keeper) getVectorUnmarshaled(ctx sdk.Context, key string) (pagerank.Vector, error) {
+func (k Keeper) getScoreVectorUnmarshaled(ctx sdk.Context, topicID string) pagerank.Vector {
 	store := ctx.KVStore(k.storeKey)
+	key := fmt.Sprintf("%s/score-vector", topicID)
 	vector := pagerank.Vector{}
-	err := json.Unmarshal(store.Get([]byte(key)), &vector)
+	json.Unmarshal(store.Get([]byte(key)), &vector)
 
-	return vector, err
+	return vector
 }
 
-func (k Keeper) getMatrixUnmarshaled(ctx sdk.Context, key string) (pagerank.Matrix, error) {
+func (k Keeper) setScoreVectorMarshaled(ctx sdk.Context, topicID string, v pagerank.Vector) {
 	store := ctx.KVStore(k.storeKey)
+	key := fmt.Sprintf("%s/score-vector", topicID)
+	bz, _ := json.Marshal(v)
+	store.Set([]byte(key), bz)
+}
+
+func (k Keeper) getLinkMatrixUnmarshaled(ctx sdk.Context, topicID string) pagerank.Matrix {
+	store := ctx.KVStore(k.storeKey)
+	key := fmt.Sprintf("%s/link-matrix", topicID)
 	matrix := pagerank.Matrix{}
-	err := json.Unmarshal(store.Get([]byte(key)), &matrix)
+	json.Unmarshal(store.Get([]byte(key)), &matrix)
 
-	return matrix, err
+	return matrix
 }
 
-func (k Keeper) setVectorMarshaled(ctx sdk.Context, key string, v pagerank.Vector) error {
+func (k Keeper) setLinkMatrixMarshaled(ctx sdk.Context, topicID string, m pagerank.Matrix) {
 	store := ctx.KVStore(k.storeKey)
-	binary, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-	store.Set([]byte(key), binary)
-
-	return nil
+	key := fmt.Sprintf("%s/link-matrix", topicID)
+	bz, _ := json.Marshal(m)
+	store.Set([]byte(key), bz)
 }
 
-func (k Keeper) setMatrixMarshaled(ctx sdk.Context, key string, m pagerank.Matrix) error {
+func (k Keeper) getStochasticMatrixUnmarshaled(ctx sdk.Context, topicID string) pagerank.Matrix {
 	store := ctx.KVStore(k.storeKey)
+	key := fmt.Sprintf("%s/stochastic-matrix", topicID)
 	matrix := pagerank.Matrix{}
+	json.Unmarshal(store.Get([]byte(key)), &matrix)
 
-	binary, err := json.Marshal(matrix)
-	if err != nil {
-		return err
-	}
-	store.Set([]byte(key), binary)
+	return matrix
+}
 
-	return nil
+func (k Keeper) setStochasticMatrixMarshaled(ctx sdk.Context, topicID string, m pagerank.Matrix) {
+	store := ctx.KVStore(k.storeKey)
+	key := fmt.Sprintf("%s/stochastic-matrix", topicID)
+	bz, _ := json.Marshal(m)
+	store.Set([]byte(key), bz)
 }

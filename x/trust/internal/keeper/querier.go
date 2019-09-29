@@ -41,6 +41,9 @@ func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, k
 	bz := codec.MustMarshalJSONIndent(keeper.cdc, vector)
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResAccountScores{Scores: string(bz)})
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
 
 	return res, nil
 }

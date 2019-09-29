@@ -24,10 +24,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 }
 
 func handleMsgEvaluate(ctx sdk.Context, keeper Keeper, msg MsgEvaluate) sdk.Result {
-	err := keeper.SetEvaluation(ctx, msg.TopicID, msg.FromAddress, msg.ToAddress, msg.Weight1000)
-	if err != nil {
-		return sdk.ResultFromError(err)
-	}
+	keeper.SetEvaluation(ctx, msg.TopicID, msg.FromAddress, msg.ToAddress, msg.Weight1000)
 
 	return sdk.Result{}
 }

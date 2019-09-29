@@ -21,7 +21,7 @@ func TestGetAccountScores(t *testing.T) {
 	scoreVector := pagerank.Vector{}
 
 	for _, topicID := range topicIDs {
-		s, _ := getScoreVectorMock(topicID)
+		s := getScoreVectorMock(topicID)
 		scoreVector[topicID] = s[account]
 
 		t.Log(account)
@@ -33,16 +33,15 @@ func TestGetAccountScores(t *testing.T) {
 	require.Equal(t, 0.3, scoreVector["nem"])
 }
 
-func getScoreVectorMock(topicID string) (pagerank.Vector, error) {
+func getScoreVectorMock(topicID string) pagerank.Vector {
 	store := map[string]string{
 		"cosmos": "{\"a\":0.5,\"b\":0.5}",
 		"nem":    "{\"a\":0.3,\"b\":0.7}",
 	}
-	score := make(pagerank.Vector)
+	score := pagerank.Vector{}
+	json.Unmarshal([]byte(store[topicID]), &score)
 
-	err := json.Unmarshal([]byte(store[topicID]), &score)
-
-	return score, err
+	return score
 }
 
 func TestGetMatrixUnmarshaled(t *testing.T) {
