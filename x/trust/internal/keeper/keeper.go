@@ -49,27 +49,27 @@ func (k Keeper) GetAccountScores(ctx sdk.Context, topicIDs []string, accAddress 
 func (k Keeper) SetEvaluation(ctx sdk.Context, topicID string, fromAddress sdk.AccAddress, toAddress sdk.AccAddress, weight1000 sdk.Int) error {
 	from := fromAddress.String()
 	to := toAddress.String()
+	linkKey := getLinkMatrixKey(topicID)
+	stochasticKey := getStochasticMatrixKey(topicID)
+	scoreKey := getScoreVectorKey(topicID)
 
-	linkMatrix, err := k.getMatrixUnmarshaled(ctx, getLinkMatrixKey(topicID))
-	if err != nil {
-		return err
-	}
+	linkMatrix, _ := k.getMatrixUnmarshaled(ctx, linkKey)
+	stochasticMatrix, _ := k.getMatrixUnmarshaled(ctx, stochasticKey)
+	scoreVector, _ := k.getVectorUnmarshaled(ctx, scoreKey)
 
-	linkMatrix.Set(from, to, float64(weight1000.Int64())/float64(1000))
+	setEvaluationAndTransition(from, to, weight1000.Int64(), &linkMatrix, &stochasticMatrix, &scoreVector)
 
-	key := getStochasticMatrixKey(topicID)
-	stochasticMatrix, err := k.getMatrixUnmarshaled(ctx, key)
-	stochasticMatrix[from] = pagerank.GetStochastixMatrix(linkMatrix)[from]
-
-	k.setMarshaled(ctx, key, stochasticMatrix)
-
-	key = getScoreVectorKey(topicID)
-	score, _ := k.getVectorUnmarshaled(ctx, key)
-
-	score, _ = pagerank.TransitionScore(score, stochasticMatrix)
-	k.setMarshaled(ctx, key, score)
+	k.setMarshaled(ctx, linkKey, linkMatrix)
+	k.setMarshaled(ctx, stochasticKey, stochasticMatrix)
+	k.setMarshaled(ctx, scoreKey, scoreVector)
 
 	return nil
+}
+
+func setEvaluationAndTransition(from string, to string, weight1000 int64, linkMatrix *pagerank.Matrix, stochasticMatrix *pagerank.Matrix, scoreVector *pagerank.Vector) {
+	linkMatrix.Set(from, to, float64(weight1000)/float64(1000))
+	(*stochasticMatrix)[from] = pagerank.GetStochastixMatrix(*linkMatrix)[from]
+	*scoreVector, _ = pagerank.TransitionScore(*scoreVector, *stochasticMatrix)
 }
 
 // DistributeTokenByScore distributes token by score
