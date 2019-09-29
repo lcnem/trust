@@ -27,9 +27,9 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 
 func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "account-scores [address] [topic-ids[,]]",
+		Use:   "account-scores [address] [topic_ids[,]]",
 		Short: "get account scores",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
