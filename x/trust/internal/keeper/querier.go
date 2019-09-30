@@ -38,7 +38,7 @@ func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, k
 	topicIDs := strings.Split(param.TopicIDs, ",")
 
 	vector := keeper.GetAccountScores(ctx, topicIDs, address)
-	bz := codec.MustMarshalJSONIndent(keeper.cdc, vector)
+	bz, _ := codec.MarshalJSONIndent(keeper.cdc, vector)
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResAccountScores{Scores: string(bz)})
 	if err != nil {
