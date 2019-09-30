@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -38,7 +39,7 @@ func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, k
 	topicIDs := strings.Split(param.TopicIDs, ",")
 
 	vector := keeper.GetAccountScores(ctx, topicIDs, address)
-	bz, _ := codec.MarshalJSONIndent(keeper.cdc, vector)
+	bz, _ := json.Marshal(vector)
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResAccountScores{Scores: string(bz)})
 	if err != nil {

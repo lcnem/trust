@@ -11,8 +11,11 @@ import (
 func (k Keeper) getScoreVectorUnmarshaled(ctx sdk.Context, topicID string) pagerank.Vector {
 	store := ctx.KVStore(k.storeKey)
 	key := fmt.Sprintf("%s/score-vector", topicID)
-	vector := pagerank.Vector{}
-	json.Unmarshal(store.Get([]byte(key)), &vector)
+	var vector pagerank.Vector
+	err := json.Unmarshal(store.Get([]byte(key)), &vector)
+	if err != nil {
+		vector = pagerank.Vector{}
+	}
 
 	return vector
 }
@@ -27,8 +30,11 @@ func (k Keeper) setScoreVectorMarshaled(ctx sdk.Context, topicID string, v pager
 func (k Keeper) getLinkMatrixUnmarshaled(ctx sdk.Context, topicID string) pagerank.Matrix {
 	store := ctx.KVStore(k.storeKey)
 	key := fmt.Sprintf("%s/link-matrix", topicID)
-	matrix := pagerank.Matrix{}
-	json.Unmarshal(store.Get([]byte(key)), &matrix)
+	var matrix pagerank.Matrix
+	err := json.Unmarshal(store.Get([]byte(key)), &matrix)
+	if err != nil {
+		matrix = pagerank.Matrix{}
+	}
 
 	return matrix
 }
@@ -43,8 +49,11 @@ func (k Keeper) setLinkMatrixMarshaled(ctx sdk.Context, topicID string, m pagera
 func (k Keeper) getStochasticMatrixUnmarshaled(ctx sdk.Context, topicID string) pagerank.Matrix {
 	store := ctx.KVStore(k.storeKey)
 	key := fmt.Sprintf("%s/stochastic-matrix", topicID)
-	matrix := pagerank.Matrix{}
-	json.Unmarshal(store.Get([]byte(key)), &matrix)
+	var matrix pagerank.Matrix
+	err := json.Unmarshal(store.Get([]byte(key)), &matrix)
+	if err != nil {
+		matrix = pagerank.Matrix{}
+	}
 
 	return matrix
 }
