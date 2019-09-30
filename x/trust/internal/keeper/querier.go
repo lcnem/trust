@@ -39,12 +39,7 @@ func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, k
 	topicIDs := strings.Split(param.TopicIDs, ",")
 
 	vector := keeper.GetAccountScores(ctx, topicIDs, address)
-	bz, _ := json.Marshal(vector)
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResAccountScores{Scores: string(bz)})
-	if err != nil {
-		panic("could not marshal result to JSON")
-	}
+	res, _ := json.Marshal(vector)
 
 	return res, nil
 }
