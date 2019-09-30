@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -40,8 +41,10 @@ func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				fmt.Printf(err.Error())
 				return nil
 			}
+			var scores map[string]float64
+			json.Unmarshal(res, &scores)
 
-			return cliCtx.PrintOutput(res)
+			return cliCtx.PrintOutput(scores)
 		},
 	}
 }

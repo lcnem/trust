@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -21,7 +22,9 @@ func getAccountScoresHandler(cliCtx context.CLIContext, storeName string) http.H
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
+		var scores map[string]float64
+		json.Unmarshal(res, &scores)
 
-		rest.PostProcessResponse(w, cliCtx, res)
+		rest.PostProcessResponse(w, cliCtx, scores)
 	}
 }
