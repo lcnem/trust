@@ -36,7 +36,7 @@ func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			bz, _ := cdc.MarshalJSON(types.QueryAccountScoresParam{Address: args[0], TopicIDs: args[1]})
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/account-scores", queryRoute), bz)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryAccountScores), bz)
 			if err != nil {
 				fmt.Printf(err.Error())
 				return nil
