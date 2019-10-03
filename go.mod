@@ -1,4 +1,4 @@
-module github.com/lcnem/lcnem-trust
+module github.com/lcnem/trust
 
 go 1.13
 

@@ -1,8 +1,8 @@
 package trust
 
 import (
-	"github.com/lcnem/lcnem-trust/x/trust/internal/keeper"
-	"github.com/lcnem/lcnem-trust/x/trust/internal/types"
+	"github.com/lcnem/trust/x/trust/internal/keeper"
+	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
 // nolint

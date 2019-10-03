@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/lcnem/lcnem-trust/x/trust/internal/types"
+	"github.com/lcnem/trust/x/trust/internal/types"
 	"github.com/spf13/cobra"
 )
 

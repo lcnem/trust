@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/lcnem/lcnem-trust/x/trust/internal/types"
+	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
 // GetTxCmd is GetTxCmd

@@ -11,14 +11,14 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
 RUN yum update -y && \
     yum install git -y
 
-RUN git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/lcnem-trust.git && \
-    git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/lcnem-trust-public.git && \
-    cd lcnem-trust && \
+RUN git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/trust.git && \
+    git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/trust-public.git && \
+    cd trust && \
     go install ./cmd/trustcli && \
     go install ./cmd/trustd && \
     cp trustd.service /etc/systemd/system/trustd.service && \
     cd ../ && \
-    rm -rf lcnem-trust && \
+    rm -rf trust && \
     systemctl enable trustd
 
 EXPOSE 26656
