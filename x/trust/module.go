@@ -8,8 +8,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/lcnem/lcnem-trust/x/trust/client/cli"
-	"github.com/lcnem/lcnem-trust/x/trust/client/rest"
+	"github.com/lcnem/trust/x/trust/client/cli"
+	"github.com/lcnem/trust/x/trust/client/rest"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"

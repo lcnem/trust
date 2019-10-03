@@ -26,7 +26,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/lcnem/lcnem-trust/x/trust"
+	"github.com/lcnem/trust/x/trust"
 )
 
 const appName = "trust"

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/lcnem/lcnem-trust/x/trust/internal/types"
+	"github.com/lcnem/trust/x/trust/internal/types"
 
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
