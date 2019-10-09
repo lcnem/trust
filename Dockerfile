@@ -6,6 +6,9 @@ WORKDIR /go/src/github.com/lcnem/trust
 # Add source files
 COPY . .
 
+RUN go install ./cmd/trustd
+RUN go install ./cmd/trustcli
+
 # Final image
 FROM alpine:edge
 
