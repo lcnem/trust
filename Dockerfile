@@ -1,25 +1,24 @@
-FROM centos:latest
+FROM golang:alpine AS build-env
 
-RUN curl -O https://dl.google.com/go/go1.13.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.13.linux-amd64.tar.gz
+# Set working directory for the build
+WORKDIR /go/src/github.com/lcnem/trust
 
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
-    chmod -R 777 "$GOPATH"
+# Add source files
+COPY . .
 
-RUN yum update -y && \
-    yum install git -y
+# Final image
+FROM alpine:edge
 
-RUN git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/trust.git && \
-    git clone https://21900d196b19ea1479417b70bd317c8449b66d98:x-oauth-basic@github.com/lcnem/trust-public.git && \
-    cd trust && \
-    go install ./cmd/trustcli && \
-    go install ./cmd/trustd && \
-    cp trustd.service /etc/systemd/system/trustd.service && \
-    cd ../ && \
-    rm -rf trust && \
-    systemctl enable trustd
+# Install ca-certificates
+RUN apk add --update ca-certificates
+WORKDIR /root
 
-EXPOSE 26656
-EXPOSE 26657
+COPY scripts/genesis.json genesis.json
+COPY scripts/init.sh init.sh
+
+# Copy over binaries from the build-env
+COPY --from=build-env /go/bin/trustd /usr/bin/trustd
+COPY --from=build-env /go/bin/trustcli /usr/bin/trustcli
+
+# Run trustd by default, omit entrypoint to ease using container with trustcli
+CMD ["trustd"]
