@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/yukimura45z/pagerank-go"
+	"github.com/KimuraYu45z/pagerank-go"
 )
 
 // DistributeTokenByScore distributes token by score

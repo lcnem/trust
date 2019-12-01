@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	"github.com/yukimura45z/pagerank-go"
+	"github.com/KimuraYu45z/pagerank-go"
 )
 
 func TestValidateTopicID(t *testing.T) {

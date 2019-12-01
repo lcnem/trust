@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	"github.com/yukimura45z/pagerank-go"
+	"github.com/KimuraYu45z/pagerank-go"
 )
 
 // Keeper maintains the link to storage and exposes getter/setter methods for the various parts of the state machine

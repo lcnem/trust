@@ -11,5 +11,5 @@ require (
 	github.com/tendermint/go-amino v0.15.0
 	github.com/tendermint/tendermint v0.32.3
 	github.com/tendermint/tm-db v0.2.0
-	github.com/yukimura45z/pagerank-go v0.0.0-20190929124623-c0d3bdb5a499
+	github.com/KimuraYu45z/pagerank-go v0.0.0-20190929124623-c0d3bdb5a499
 )
