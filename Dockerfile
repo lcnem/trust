@@ -10,7 +10,7 @@ RUN go install ./cmd/trustd
 RUN go install ./cmd/trustcli
 
 # Final image
-FROM alpine:edge
+FROM ubuntu:latest
 
 # Install ca-certificates
 RUN apk add --update ca-certificates

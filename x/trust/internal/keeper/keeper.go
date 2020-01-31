@@ -1,62 +1,55 @@
 package keeper
 
 import (
+	"fmt"
+
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-
-	"github.com/KimuraYu45z/pagerank-go"
+	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
-// Keeper maintains the link to storage and exposes getter/setter methods for the various parts of the state machine
+// Keeper of the trust store
 type Keeper struct {
-	cdc *codec.Codec // The wire codec for binary encoding/decoding.
-
-	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
-
-	BankKeeper bank.Keeper
+	storeKey   sdk.StoreKey
+	cdc        *codec.Codec
 }
 
-// NewKeeper creates new instances of the coin Keeper
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper) Keeper {
-	return Keeper{
+// NewKeeper creates a trust keeper
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey) Keeper {
+	keeper := Keeper{
+		storeKey:   key,
 		cdc:        cdc,
-		storeKey:   storeKey,
-		BankKeeper: bankKeeper,
 	}
+	return keeper
 }
 
-// GetAccountScores returns the score
-func (k Keeper) GetAccountScores(ctx sdk.Context, topicIDs []string, accAddress sdk.AccAddress) pagerank.Vector {
-	account := accAddress.String()
-	scoreVector := pagerank.Vector{}
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
 
-	for _, topicID := range topicIDs {
-		s := k.getScoreVectorUnmarshaled(ctx, topicID)
-		scoreVector[topicID] = s[account]
+// Get returns the pubkey from the adddress-pubkey relation
+func (k Keeper) Get(ctx sdk.Context, key string) (/* TODO: Fill out this type */, error) {
+	store := ctx.KVStore(k.storeKey)
+	var item /* TODO: Fill out this type */
+	byteKey := []byte(key)
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(byteKey), &item)
+	if err != nil {
+		return nil, err
 	}
-
-	return scoreVector
+	return item, nil
 }
 
-// SetEvaluation sets the evaluation
-func (k Keeper) SetEvaluation(ctx sdk.Context, topicID string, fromAddress sdk.AccAddress, toAddress sdk.AccAddress, weight1000 sdk.Int) {
-	from := fromAddress.String()
-	to := toAddress.String()
-
-	linkMatrix := k.getLinkMatrixUnmarshaled(ctx, topicID)
-	stochasticMatrix := pagerank.GetStochastixMatrix(linkMatrix)
-	scoreVector := k.getScoreVectorUnmarshaled(ctx, topicID)
-
-	setEvaluationAndTransition(from, to, weight1000.Int64(), &linkMatrix, &stochasticMatrix, &scoreVector)
-
-	k.setLinkMatrixMarshaled(ctx, topicID, linkMatrix)
-	k.setStochasticMatrixMarshaled(ctx, topicID, stochasticMatrix)
-	k.setScoreVectorMarshaled(ctx, topicID, scoreVector)
+func (k Keeper) set(ctx sdk.Context, key string, value /* TODO: fill out this type */ ) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(value)
+	store.Set([]byte(key), bz)
 }
 
-func setEvaluationAndTransition(from string, to string, weight1000 int64, linkMatrix *pagerank.Matrix, stochasticMatrix *pagerank.Matrix, scoreVector *pagerank.Vector) {
-	linkMatrix.Set(from, to, float64(weight1000)/float64(1000))
-	*stochasticMatrix = pagerank.GetStochastixMatrix(*linkMatrix)
-	*scoreVector = pagerank.TransitionScore(*scoreVector, *stochasticMatrix)
+func (k Keeper) delete(ctx sdk.Context, key string) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete([]byte(key))
 }

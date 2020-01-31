@@ -1,30 +1,40 @@
 package rest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/lcnem/trust/x/trust/internal/types"
-
-	"github.com/cosmos/cosmos-sdk/types/rest"
-
 	"github.com/gorilla/mux"
+
+	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
-func getAccountScoresHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		bz, _ := cliCtx.Codec.MarshalJSON(types.QueryAccountScoresParam{Address: mux.Vars(r)["address"], TopicIDs: mux.Vars(r)["topic-ids"]})
+func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// TODO: Define your GET REST endpoints
+	r.HandleFunc(
+		"/trust/parameters",
+		queryParamsHandlerFn(cliCtx),
+	).Methods("GET")
+}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", storeName, types.QueryAccountScores), bz)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+func queryParamsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
 			return
 		}
-		var scores map[string]float64
-		json.Unmarshal(res, &scores)
 
-		rest.PostProcessResponse(w, cliCtx, scores)
+		route := fmt.Sprintf("custom/%s/parameters", types.QuerierRoute)
+
+		res, height, err := cliCtx.QueryWithData(route, nil)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		cliCtx = cliCtx.WithHeight(height)
+		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }

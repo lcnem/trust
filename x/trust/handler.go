@@ -4,45 +4,42 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
-// NewHandler returns a handler for "coin" type messages.
-func NewHandler(keeper Keeper) sdk.Handler {
+// NewHandler creates an sdk.Handler for all the trust type messages
+func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		case MsgEvaluate:
-			return handleMsgEvaluate(ctx, keeper, msg)
-		case MsgDistributeTokenByScore:
-			return handleMsgDistributeTokenByScore(ctx, keeper, msg)
-		case MsgDistributeTokenByEvaluation:
-			return handleMsgDistributeTokenByEvaluation(ctx, keeper, msg)
+		// TODO: Define your msg cases
+		// 
+		//Example:
+		// case MsgSet<Action>:
+		// 	return handleMsg<Action>(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized coin Msg type: %v", msg.Type())
+			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName,  msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
 }
 
-func handleMsgEvaluate(ctx sdk.Context, keeper Keeper, msg MsgEvaluate) sdk.Result {
-	keeper.SetEvaluation(ctx, msg.TopicID, msg.FromAddress, msg.ToAddress, msg.Weight1000)
+// handde<Action> does x
+func handleMsg<Action>(ctx sdk.Context, msg MsgType, k Keeper) sdk.Result {
 
-	return sdk.Result{}
-}
-
-func handleMsgDistributeTokenByScore(ctx sdk.Context, keeper Keeper, msg MsgDistributeTokenByScore) sdk.Result {
-	err := keeper.DistributeTokenByScore(ctx, msg.TopicID, msg.FromAddress, msg.Amount)
+	err := k.<Action>(ctx, msg.ValidatorAddr)
 	if err != nil {
-		return sdk.ResultFromError(err)
+		return err.Result()
 	}
 
-	return sdk.Result{}
-}
+	// TODO: Define your msg events
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.ValidatorAddr.String()),
+		),
+	)
 
-func handleMsgDistributeTokenByEvaluation(ctx sdk.Context, keeper Keeper, msg MsgDistributeTokenByEvaluation) sdk.Result {
-	err := keeper.DistributeTokenByEvaluation(ctx, msg.TopicID, msg.Address, msg.FromAddress, msg.Amount)
-	if err != nil {
-		return sdk.ResultFromError(err)
-	}
-
-	return sdk.Result{}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }

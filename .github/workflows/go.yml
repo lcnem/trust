@@ -25,4 +25,10 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v .
+      run: |
+        go build -v ./cmd/trustcli
+        go build -v ./cmd/trustd
+    
+    - name: Test
+      run: |
+        go test ./app
