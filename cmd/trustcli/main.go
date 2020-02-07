@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// Add --chain-id to persistent flags and mark it required
-	rootCmd.PersistentFlags().String(flags.FlagChainID, "", "Chain ID of tendermint node")
+	rootCmd.PersistentFlags().String(flags.FlagChainID, "TRUST", "Chain ID of tendermint node")
 	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
 		return initConfig(rootCmd)
 	}
@@ -73,7 +73,7 @@ func main() {
 	)
 
 	// Add flags and prefix all env exposed with TR
-	executor := cli.PrepareMainCmd(rootCmd, "TR", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "TRUST", app.DefaultCLIHome)
 
 	err := executor.Execute()
 	if err != nil {

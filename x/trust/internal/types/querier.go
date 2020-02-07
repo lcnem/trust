@@ -5,6 +5,7 @@ package types
 const (
 	//TODO: Describe query parameters, update <action> with your query
 	// Query<Action>    = "<action>"
+	QueryAccountScores    = "account-scores"
 )
 
 /* 
@@ -20,3 +21,15 @@ func (n QueryResList) String() string {
 }
 
 */
+
+
+// QueryAccountScoresParam QueryAccountScoresParam
+type QueryAccountScoresParam struct {
+	Address  string `json:"address"`
+	TopicIDs string `json:"topic_ids"`
+}
+
+// QueryResAccountScores Queries Result Payload
+type QueryResAccountScores struct {
+	Scores string `json:"scores" yaml:"scores"`
+}

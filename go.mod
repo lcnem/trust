@@ -3,6 +3,7 @@ module github.com/lcnem/trust
 go 1.13
 
 require (
+	github.com/KimuraYu45z/pagerank-go v0.0.0-20200207000331-856677daa1b7
 	github.com/btcsuite/btcd v0.0.0-20190807005414-4063feeff79a // indirect
 	github.com/cosmos/cosmos-sdk v0.38.0
 	github.com/golang/mock v1.3.1 // indirect

@@ -32,6 +32,8 @@ var (
 	// variable aliases
 	ModuleCdc     = types.ModuleCdc
 	// TODO: Fill out variable aliases
+	ErrInvalidTopicID = types.ErrInvalidTopicID
+	ErrInvalidWeight = types.ErrInvalidWeight
 )
 
 type (

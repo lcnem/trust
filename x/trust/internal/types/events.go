@@ -4,6 +4,9 @@ package types
 const (
 	// TODO: Create your event types
 	// EventType<Action>    		= "action"
+	EventTypeEvaluate    		= "evaluate"
+	EventTypeDistributeByScore    		= "distribute-by-score"
+	EventTypeDistributeByEvaluation    		= "distribute-by-evaluation"
 
 	// TODO: Create keys fo your events, the values will be derivided from the msg
 	// AttributeKeyAddress  		= "address"

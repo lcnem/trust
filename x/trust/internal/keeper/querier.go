@@ -16,8 +16,8 @@ import (
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
-		case types.QueryParams:
-			return queryParams(ctx, k)
+		case types.QueryAccountScores:
+			return queryAccountScores(ctx, k, path[1:], req)
 			// TODO: Put the modules query routes
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown trust query endpoint")
@@ -25,13 +25,18 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
-	params := k.GetParams(ctx)
+func queryAccountScores(ctx sdk.Context, k Keeper, path []string, req abci.RequestQuery) ([]byte, error) {
+	var param types.QueryAccountScoresParam
+	codec.Cdc.MustUnmarshalJSON(req.Data, &param)
 
-	res, err := codec.MarshalJSONIndent(types.ModuleCdc, params)
+	address, err := sdk.AccAddressFromBech32(param.Address)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, err.Error())
 	}
+	topicIDs := strings.Split(param.TopicIDs, ",")
+
+	vector := keeper.GetAccountScores(ctx, topicIDs, address)
+	res, _ := json.Marshal(vector)
 
 	return res, nil
 }

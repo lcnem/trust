@@ -28,7 +28,9 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 	trustTxCmd.AddCommand(flags.PostCommands(
 		// TODO: Add tx based commands
-		// GetCmd<Action>(cdc)
+		getCmdEvaluate(cdc),
+		getCmdDistributeByScore(cdc),
+		getCmdDistributeByEvaluation(cdc),
 	)...)
 
 	return trustTxCmd
@@ -57,3 +59,95 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 // 		},
 // 	}
 // }
+
+func getCmdEvaluate(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "evaluate [topic_id] [to_address] [weight]",
+		Short: "evaluate",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			toAddress, err := sdk.AccAddressFromBech32(args[1])
+			if err != nil {
+				return err
+			}
+
+			weight1000, ok := sdk.NewIntFromString(args[2])
+			if !ok {
+				return sdk.ErrUnknownRequest(args[2])
+			}
+
+			msg := types.NewMsgEvaluate(args[0], cliCtx.GetFromAddress(), toAddress, weight1000)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func getCmdDistributeByScore(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "distribute-by-score [topic_id] [amount]",
+		Short: "distribute your token by score",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			fromAddress := cliCtx.GetFromAddress()
+
+			coin, err := sdk.ParseCoin(args[1])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDistributeByScore(args[0], fromAddress, coin)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+func getCmdDistributeByEvaluation(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "distribute-by-evaluation [topic_id] [address] [amount]",
+		Short: "distribute your token by evaluation",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			address, err := sdk.AccAddressFromBech32(args[1])
+			if err != nil {
+				return err
+			}
+
+			fromAddress := cliCtx.GetFromAddress()
+
+			coin, err := sdk.ParseCoin(args[2])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDistributeByEvaluation(args[0], address, fromAddress, coin)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}

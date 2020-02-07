@@ -8,6 +8,8 @@ github.com/ChainSafe/go-schnorrkel v0.0.0-20200102211924-4bcbc698314f h1:4O1om+U
 github.com/ChainSafe/go-schnorrkel v0.0.0-20200102211924-4bcbc698314f/go.mod h1:URdX5+vg25ts3aCh8H5IFZybJYKWhJHYMTnf+ULtoC4=
 github.com/KimuraYu45z/pagerank-go v0.0.0-20190929124623-c0d3bdb5a499 h1:nl5FTCrmNSDvvKACSNjjnBMG1/aBagBPiwGX0WfQ7TE=
 github.com/KimuraYu45z/pagerank-go v0.0.0-20190929124623-c0d3bdb5a499/go.mod h1:p6iuwttTlVa82fJ75kcwh8qODW+s4bxjoBPPPRNw06M=
+github.com/KimuraYu45z/pagerank-go v0.0.0-20200207000331-856677daa1b7 h1:cnDg9aD3DfticTGUFWe7USFwni5B7gnwDAM48BdTvBA=
+github.com/KimuraYu45z/pagerank-go v0.0.0-20200207000331-856677daa1b7/go.mod h1:R4Gxizm9M1i8m8BiV9Pkoo+/3c2XhaUyazCkSWKAgnU=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/VividCortex/gohistogram v1.0.0 h1:6+hBz+qvs0JOrrNhhmR7lFxo5sINxBCGXrdtl/UvroE=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
