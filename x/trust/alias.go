@@ -5,31 +5,44 @@ import (
 	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
-// nolint
 const (
-	ModuleName = types.ModuleName
-	RouterKey  = types.RouterKey
-	StoreKey   = types.StoreKey
+	// TODO: define constants that you would like exposed from the internal package
+
+	ModuleName        = types.ModuleName
+	RouterKey         = types.RouterKey
+	StoreKey          = types.StoreKey
+	DefaultParamspace = types.DefaultParamspace
+	QueryParams       = types.QueryParams
+	QuerierRoute      = types.QuerierRoute
 )
 
-// nolint
 var (
-	NewKeeper                         = keeper.NewKeeper
-	NewQuerier                        = keeper.NewQuerier
+	// functions aliases
+	NewKeeper           = keeper.NewKeeper
+	NewQuerier          = keeper.NewQuerier
+	RegisterCodec       = types.RegisterCodec
+	NewGenesisState     = types.NewGenesisState
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
+	// TODO: Fill out function aliases
 	NewMsgEvaluate                    = types.NewMsgEvaluate
 	NewMsgDistributeTokenByScore      = types.NewMsgDistributeTokenByScore
 	NewMsgDistributeTokenByEvaluation = types.NewMsgDistributeTokenByEvaluation
-	ModuleCdc                         = types.ModuleCdc
-	RegisterCodec                     = types.RegisterCodec
+
+	// variable aliases
+	ModuleCdc     = types.ModuleCdc
+	// TODO: Fill out variable aliases
+	ErrInvalidTopicID = types.ErrInvalidTopicID
+	ErrInvalidWeight = types.ErrInvalidWeight
 )
 
 type (
-	// Keeper keeper.Keeper
-	Keeper = keeper.Keeper
-	// MsgEvaluate types.MsgEvaluate
+	Keeper       = keeper.Keeper
+	GenesisState = types.GenesisState
+	Params       = types.Params
+
+	// TODO: Fill out module types
 	MsgEvaluate = types.MsgEvaluate
-	// MsgDistributeTokenByScore types.MsgDistributeTokenByScore
 	MsgDistributeTokenByScore = types.MsgDistributeTokenByScore
-	// MsgDistributeTokenByEvaluation types.MsgDistributeTokenByEvaluation
 	MsgDistributeTokenByEvaluation = types.MsgDistributeTokenByEvaluation
 )

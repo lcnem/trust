@@ -1,9 +1,13 @@
 package cli
 
 import (
+	"fmt"
+	"bufio"
+
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,28 +16,53 @@ import (
 	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
-// GetTxCmd is GetTxCmd
-func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	coinTxCmd := &cobra.Command{
+// GetTxCmd returns the transaction commands for this module
+func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+	trustTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Trust transaction subcommands",
+		Short:                      fmt.Sprintf("%S transactions subcommands", types.ModuleName),
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
 
-	coinTxCmd.AddCommand(client.PostCommands(
+	trustTxCmd.AddCommand(flags.PostCommands(
+		// TODO: Add tx based commands
 		getCmdEvaluate(cdc),
-		getCmdDistributeTokenByScore(cdc),
-		getCmdDistributeTokenByEvaluation(cdc),
+		getCmdDistributeByScore(cdc),
+		getCmdDistributeByEvaluation(cdc),
 	)...)
 
-	return coinTxCmd
+	return trustTxCmd
 }
+
+// Example:
+//
+// GetCmd<Action> is the CLI command for doing <Action>
+// func GetCmd<Action>(cdc *codec.Codec) *cobra.Command {
+// 	return &cobra.Command{
+// 		Use:   "/* Describe your action cmd */",
+// 		Short: "/* Provide a short description on the cmd */",
+// 		Args:  cobra.ExactArgs(2), // Does your request require arguments
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+// 			inBuf := bufio.NewReader(cmd.InOrStdin())
+// 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+
+// 			msg := types.NewMsg<Action>(/* Action params */)
+// 			err = msg.ValidateBasic()
+// 			if err != nil {
+// 				return err
+// 			}
+
+// 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+// 		},
+// 	}
+// }
 
 func getCmdEvaluate(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "evaluate [topic_id] [to_address] [weight1000]",
+		Use:   "evaluate [topic_id] [to_address] [weight]",
 		Short: "evaluate",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -62,7 +91,7 @@ func getCmdEvaluate(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func getCmdDistributeTokenByScore(cdc *codec.Codec) *cobra.Command {
+func getCmdDistributeByScore(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "distribute-by-score [topic_id] [amount]",
 		Short: "distribute your token by score",
@@ -79,7 +108,7 @@ func getCmdDistributeTokenByScore(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDistributeTokenByScore(args[0], fromAddress, coin)
+			msg := types.NewMsgDistributeByScore(args[0], fromAddress, coin)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -90,7 +119,7 @@ func getCmdDistributeTokenByScore(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func getCmdDistributeTokenByEvaluation(cdc *codec.Codec) *cobra.Command {
+func getCmdDistributeByEvaluation(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "distribute-by-evaluation [topic_id] [address] [amount]",
 		Short: "distribute your token by evaluation",
@@ -112,7 +141,7 @@ func getCmdDistributeTokenByEvaluation(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDistributeTokenByEvaluation(args[0], address, fromAddress, coin)
+			msg := types.NewMsgDistributeByEvaluation(args[0], address, fromAddress, coin)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err

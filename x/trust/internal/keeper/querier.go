@@ -1,35 +1,37 @@
 package keeper
 
 import (
-	"encoding/json"
-	"strings"
+	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/lcnem/trust/x/trust/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/lcnem/trust/x/trust/internal/types"
 )
 
-// NewQuerier is the module level router for state queries
-func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
+// NewQuerier creates a new querier for trust clients.
+func NewQuerier(k Keeper) sdk.Querier {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryAccountScores:
-			return queryAccountScores(ctx, path[1:], req, keeper)
+			return queryAccountScores(ctx, k, path[1:], req)
+			// TODO: Put the modules query routes
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown trust query endpoint")
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown trust query endpoint")
 		}
 	}
 }
 
-func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryAccountScores(ctx sdk.Context, k Keeper, path []string, req abci.RequestQuery) ([]byte, error) {
 	var param types.QueryAccountScoresParam
 	codec.Cdc.MustUnmarshalJSON(req.Data, &param)
 
 	address, err := sdk.AccAddressFromBech32(param.Address)
 	if err != nil {
-		return nil, sdk.ErrInvalidAddress(address.String())
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, err.Error())
 	}
 	topicIDs := strings.Split(param.TopicIDs, ",")
 
@@ -38,3 +40,6 @@ func queryAccountScores(ctx sdk.Context, path []string, req abci.RequestQuery, k
 
 	return res, nil
 }
+
+// TODO: Add the modules query functions
+// They will be similar to the above one: queryParams()

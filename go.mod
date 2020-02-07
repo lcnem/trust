@@ -3,13 +3,22 @@ module github.com/lcnem/trust
 go 1.13
 
 require (
-	github.com/cosmos/cosmos-sdk v0.34.4-0.20190922212952-dc838ddd73d6
+	github.com/KimuraYu45z/pagerank-go v0.0.0-20200207000331-856677daa1b7
+	github.com/btcsuite/btcd v0.0.0-20190807005414-4063feeff79a // indirect
+	github.com/cosmos/cosmos-sdk v0.38.0
+	github.com/golang/mock v1.3.1 // indirect
 	github.com/gorilla/mux v1.7.3
+	github.com/onsi/ginkgo v1.8.0 // indirect
+	github.com/onsi/gomega v1.5.0 // indirect
+	github.com/prometheus/client_golang v1.1.0 // indirect
+	github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 // indirect
+	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.5
-	github.com/spf13/viper v1.4.0
+	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.4.0
-	github.com/tendermint/go-amino v0.15.0
-	github.com/tendermint/tendermint v0.32.3
-	github.com/tendermint/tm-db v0.2.0
-	github.com/KimuraYu45z/pagerank-go v0.0.0-20190929124623-c0d3bdb5a499
+	github.com/tendermint/go-amino v0.15.1
+	github.com/tendermint/tendermint v0.33.0
+	github.com/tendermint/tm-db v0.4.0
+	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
+	golang.org/x/text v0.3.2 // indirect
 )

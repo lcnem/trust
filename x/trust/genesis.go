@@ -2,34 +2,24 @@ package trust
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/lcnem/trust/x/trust/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// GenesisState is genesis state
-type GenesisState struct {
-}
+// InitGenesis initialize default parameters
+// and the keeper's address to pubkey map
+func InitGenesis(ctx sdk.Context, k Keeper, data types.GenesisState) {
 
-// NewGenesisState is a constructor of GenesisState
-func NewGenesisState(master string) GenesisState {
-	return GenesisState{}
-}
+	// TODO: Define logic for when you would like to initalize a new genesis
 
-// ValidateGenesis checks the Genesis
-func ValidateGenesis(data GenesisState) error {
-	return nil
-}
-
-// DefaultGenesisState returns default genesis state
-func DefaultGenesisState() GenesisState {
-	return GenesisState{}
-}
-
-// InitGenesis inits genesis
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
 
-// ExportGenesis exports genesis
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	return GenesisState{}
+// ExportGenesis writes the current store values
+// to a genesis file, which can be imported again
+// with InitGenesis
+func ExportGenesis(ctx sdk.Context, k Keeper) (data types.GenesisState) {
+
+	// TODO: Define logic for exporting state
+	return types.NewGenesisState()
 }

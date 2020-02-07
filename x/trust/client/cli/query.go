@@ -1,30 +1,42 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
+	"strings"
+
+	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/lcnem/trust/x/trust/internal/types"
-	"github.com/spf13/cobra"
 )
 
-// GetQueryCmd returns query commands
-func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	coinQueryCmd := &cobra.Command{
+// GetQueryCmd returns the cli query commands for this module
+func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	// Group trust queries under a subcommand
+	trustQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Querying commands for the trust module",
+		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	coinQueryCmd.AddCommand(client.GetCommands(
-		getCmdAccountScores(storeKey, cdc),
-	)...)
-	return coinQueryCmd
+
+	trustQueryCmd.AddCommand(
+		flags.GetCommands(
+			getCmdAccountScores(queryRoute, cdc),
+		)...,
+	)
+
+	return trustQueryCmd
+
 }
+
+// TODO: Add Query Commands
 
 func getCmdAccountScores(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
